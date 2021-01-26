@@ -9,20 +9,16 @@
   "categories": [
     "Other"
   ],
-  "publisher": "jorenbroekema",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-workshop-kit/vscode-extension.git"
+  },
+  "publisher": "code-workshop-kit",
   "activationEvents": [
-    "onCommand:cwk.helloWorld",
     "workspaceContains: **/cwk.config.js"
   ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "cwk.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -32,6 +28,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.13.1",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
@@ -52,6 +49,9 @@
   },
   "dependencies": {
     "@babel/core": "^7.12.10",
+    "@babel/traverse": "^7.12.12",
+    "@babel/types": "^7.12.12",
+    "@types/babel__core": "^7.1.12",
     "vsls": "^1.0.3015"
   }
 }

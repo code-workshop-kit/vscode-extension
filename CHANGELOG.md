@@ -1,9 +1,6 @@
-# Change Log
+# code-workshop-kit
 
-All notable changes to the "code-workshop-kit" extension will be documented in this file.
+## 0.0.1
+### Patch Changes
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- First release of code-workshop-kit extension. Takes the user session id from live share and adds the user to the cwk.config.js
