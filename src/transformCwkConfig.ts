@@ -76,8 +76,10 @@ export const addParticipantCwkConfig = (participant: string, cwkPath: string) =>
       plugins: [[addParticipantWithBabel, { participant }]],
     });
 
-    if (newCfg) {
+    if (newCfg && newCfg !== cfgCode) {
       fs.writeFileSync(cwkPath, newCfg.code);
+      return true;
     }
   }
+  return false;
 };
