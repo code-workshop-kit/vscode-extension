@@ -1,5 +1,5 @@
 {
-  "name": "code-workshop-kit",
+  "name": "code-workshop-kit-extension",
   "displayName": "code-workshop-kit",
   "description": "code-workshop-kit extension. The future of remote code workshops!",
   "version": "0.0.1",
@@ -15,7 +15,7 @@
   },
   "publisher": "code-workshop-kit",
   "activationEvents": [
-    "workspaceContains: **/cwk.config.js"
+    "workspaceContains:**/cwk.config.js"
   ],
   "main": "./out/extension.js",
   "contributes": {},
@@ -25,10 +25,12 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "release": "vsce publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.13.1",
+    "@types/esm": "^3.2.0",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.4",
     "@types/node": "^12.11.7",
@@ -40,6 +42,7 @@
     "mocha": "^8.1.3",
     "prettier": "^2.2.1",
     "typescript": "^4.1.2",
+    "vsce": "^1.87.0",
     "vscode-test": "^1.4.1"
   },
   "prettier": {
@@ -51,7 +54,10 @@
     "@babel/core": "^7.12.10",
     "@babel/traverse": "^7.12.12",
     "@babel/types": "^7.12.12",
+    "@open-wc/create": "^0.37.75",
     "@types/babel__core": "^7.1.12",
+    "code-workshop-kit": "^2.0.3",
+    "esm": "^3.2.25",
     "vsls": "^1.0.3015"
   }
 }

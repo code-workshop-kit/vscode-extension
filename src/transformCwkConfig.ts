@@ -1,7 +1,7 @@
 import { transformSync } from '@babel/core';
-import * as BabelTypes from '@babel/types';
+import BabelTypes from '@babel/types';
 import { Visitor, NodePath } from '@babel/traverse';
-import * as fs from 'fs';
+import fs from 'fs';
 
 export interface PluginOptions {
   opts?: {
@@ -76,8 +76,10 @@ export const addParticipantCwkConfig = (participant: string, cwkPath: string) =>
       plugins: [[addParticipantWithBabel, { participant }]],
     });
 
-    if (newCfg) {
+    if (newCfg && newCfg !== cfgCode) {
       fs.writeFileSync(cwkPath, newCfg.code);
+      return true;
     }
   }
+  return false;
 };
