@@ -1,7 +1,7 @@
 import { transformSync } from '@babel/core';
-import * as BabelTypes from '@babel/types';
+import BabelTypes from '@babel/types';
 import { Visitor, NodePath } from '@babel/traverse';
-import * as fs from 'fs';
+import fs from 'fs';
 
 export interface PluginOptions {
   opts?: {

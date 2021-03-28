@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { getApi, LiveShare } from 'vsls';
 import _esmRequire from 'esm';
 
