@@ -2,7 +2,7 @@
   "name": "code-workshop-kit-extension",
   "displayName": "code-workshop-kit",
   "description": "code-workshop-kit extension. The future of remote code workshops!",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.52.0"
   },
