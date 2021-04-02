@@ -11,9 +11,7 @@ export default {
     appTitle: 'Cool Frontend App',
 
     // It is possible to have dynamic data where you can run JS that returns a String
-    participantNameLowercase() {
-      // participantName is a special value that represents the name of the current participant
-      // that we are scaffolding files for.
+    participantNameToLower() {
       return this.participantName.toLowerCase();
     },
 

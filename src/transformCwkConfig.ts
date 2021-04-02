@@ -2,6 +2,8 @@ import { transformSync } from '@babel/core';
 import BabelTypes from '@babel/types';
 import { Visitor, NodePath } from '@babel/traverse';
 import fs from 'fs';
+import vscode, { Uri } from 'vscode';
+import { TextDecoder, TextEncoder } from 'util';
 
 export interface PluginOptions {
   opts?: {
@@ -68,16 +70,18 @@ const addParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions
   };
 };
 
-export const addParticipantCwkConfig = (participant: string, cwkPath: string) => {
-  if (fs.existsSync(cwkPath)) {
-    const cfgCode = fs.readFileSync(cwkPath, 'utf8');
+export const addParticipantCwkConfig = async (participant: string, file: Uri) => {
+  if (fs.existsSync(file.path)) {
+    const cfgCodeAsUInt8Array = await vscode.workspace.fs.readFile(file);
+    const cfgCode = new TextDecoder('utf-8').decode(cfgCodeAsUInt8Array);
 
     const newCfg = transformSync(cfgCode, {
       plugins: [[addParticipantWithBabel, { participant }]],
     });
 
-    if (newCfg && newCfg !== cfgCode) {
-      fs.writeFileSync(cwkPath, newCfg.code);
+    if (newCfg && newCfg.code && newCfg.code !== cfgCode) {
+      const newCfgAsUInt8Array = new TextEncoder().encode(newCfg.code);
+      await vscode.workspace.fs.writeFile(file, newCfgAsUInt8Array);
       return true;
     }
   }

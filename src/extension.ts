@@ -11,14 +11,14 @@ function getCwkTemplateData(file: vscode.Uri) {
 }
 
 function setup(vsls: LiveShare, file: vscode.Uri) {
-  const templateData = getCwkTemplateData(file);
-
   // When the host starts the session
   vsls.onDidChangeSession(async (e) => {
-    if (e.session) {
+    // truesy check on id because it is null when session ends and host leaves
+    if (e.session && e.session.id) {
+      const templateData = getCwkTemplateData(file);
       const participant =
         e.session.user?.displayName ?? e.session.user?.userName ?? `${e.session.peerNumber}`;
-      handleParticipantJoin(participant, file.path, templateData);
+      handleParticipantJoin(participant, file, templateData);
     }
   });
 
@@ -26,8 +26,9 @@ function setup(vsls: LiveShare, file: vscode.Uri) {
   vsls.onDidChangePeers(async (e) => {
     const peers = e.added;
     peers.forEach((peer) => {
+      const templateData = getCwkTemplateData(file);
       const participant = peer.user?.displayName ?? peer.user?.userName ?? `${peer.peerNumber}`;
-      handleParticipantJoin(participant, file.path, templateData);
+      handleParticipantJoin(participant, file, templateData);
     });
   });
 }
