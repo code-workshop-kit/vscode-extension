@@ -1,0 +1,6 @@
+coverage/
+CHANGELOG.md
+bundlesize/
+out/
+.vscode-test/
+sandbox-dir/

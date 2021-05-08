@@ -19,6 +19,7 @@ export default {
       // participantName is a special value that represents the name of the current participant
       // that we are scaffolding files for.
       return `Hi ${this.participantName}, welcome to ${this.appTitle}!`;
-    },
-  },
+    }
+
+  }
 };
