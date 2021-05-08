@@ -1,5 +1,11 @@
 # code-workshop-kit
 
+## 0.2.0
+
+### Minor Changes
+
+- fda370f: Participants that leave, have their folder moved to \_cwk_disconnected. Upon rejoining, it is moved back to the original place so no code is lost. CWK itself will ignore \_cwk_disconnected as a participant so it is hidden from the workshop.
+
 ## 0.1.1
 
 ### Patch Changes
