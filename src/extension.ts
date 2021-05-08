@@ -1,16 +1,20 @@
-import vscode from 'vscode';
-import { getApi, LiveShare } from 'vsls';
+import vscode, { Uri, workspace, window } from 'vscode';
+import { getApi, LiveShare, Peer } from 'vsls';
 import _esmRequire from 'esm';
 
-import { handleParticipantJoin } from './participant-join';
+import { handleParticipantJoin, handleParticipantLeave } from './participant-join';
 
-function getCwkTemplateData(file: vscode.Uri) {
+function getCwkTemplateData(file: Uri) {
   const esmRequire = _esmRequire(module);
   const importedCwkConfig = esmRequire(file.path);
   return importedCwkConfig.default.templateData || {};
 }
 
-function setup(vsls: LiveShare, file: vscode.Uri) {
+function participantNameFromPeer(peer: Peer) {
+  return peer.user?.displayName ?? peer.user?.userName ?? `${peer.peerNumber}`;
+}
+
+function setup(vsls: LiveShare, file: Uri) {
   // When the host starts the session
   vsls.onDidChangeSession(async (e) => {
     // truesy check on id because it is null when session ends and host leaves
@@ -22,29 +26,37 @@ function setup(vsls: LiveShare, file: vscode.Uri) {
     }
   });
 
-  // When participants join the session
+  // When participants joins/leaves the session
   vsls.onDidChangePeers(async (e) => {
-    const peers = e.added;
-    peers.forEach((peer) => {
-      const templateData = getCwkTemplateData(file);
-      const participant = peer.user?.displayName ?? peer.user?.userName ?? `${peer.peerNumber}`;
-      handleParticipantJoin(participant, file, templateData);
+    const addedPeers = e.added;
+    const removedPeers = e.removed;
+    const templateData = getCwkTemplateData(file);
+
+    const participantHandlers: Promise<void>[] = [];
+    addedPeers.forEach((peer) => {
+      const participant = participantNameFromPeer(peer);
+      participantHandlers.push(handleParticipantJoin(participant, file, templateData));
     });
+    removedPeers.forEach((peer) => {
+      const participant = participantNameFromPeer(peer);
+      participantHandlers.push(handleParticipantLeave(participant, file));
+    });
+    await Promise.all(participantHandlers);
   });
 }
 
 export async function activate() {
   const vsls = await getApi();
   if (!vsls) {
-    vscode.window.showInformationMessage('Error: vsls not installed');
+    window.showInformationMessage('Error: vsls not installed');
     return;
   }
 
-  const files = await vscode.workspace.findFiles('**/cwk.config.js');
+  const files = await workspace.findFiles('**/cwk.config.js');
   if (files.length) {
     setup(vsls, files[0]);
   } else {
-    vscode.window.showInformationMessage('Could not find cwk.config.js');
+    window.showInformationMessage('Could not find cwk.config.js');
   }
 
   // TODO: provide some easy ways to turn the extension on/off

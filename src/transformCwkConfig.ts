@@ -1,8 +1,8 @@
-import { transformSync } from '@babel/core';
+import { transformAsync } from '@babel/core';
 import BabelTypes from '@babel/types';
 import { Visitor, NodePath } from '@babel/traverse';
 import fs from 'fs';
-import vscode, { Uri } from 'vscode';
+import vscode, { Uri, workspace } from 'vscode';
 import { TextDecoder, TextEncoder } from 'util';
 
 export interface PluginOptions {
@@ -10,6 +10,7 @@ export interface PluginOptions {
     target?: string;
     runtime?: string;
     participant: string;
+    add: boolean;
   };
   file: {
     path: NodePath;
@@ -19,6 +20,13 @@ export interface PluginOptions {
 export interface Babel {
   types: typeof BabelTypes;
 }
+
+const removeParticipantVisitor = (path: BabelTypes.ArrayExpression, participant: string) => {
+  path.elements.splice(
+    path.elements.findIndex((el) => el?.type === 'StringLiteral' && el?.value === participant),
+    1,
+  );
+};
 
 const addParticipantVisitor = (
   t: typeof BabelTypes,
@@ -38,7 +46,7 @@ const addParticipantVisitor = (
   });
 };
 
-const addParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions> } => {
+const changeParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions> } => {
   const t = babel.types;
   return {
     visitor: {
@@ -47,7 +55,7 @@ const addParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions
         if (!state.opts || !state.opts.participant) {
           return;
         }
-        const participant = state.opts.participant;
+        const { participant, add } = state.opts;
 
         if (
           path.node.key.type === 'Identifier' &&
@@ -61,8 +69,14 @@ const addParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions
             return elem.value === participant;
           });
 
-          if (participantAlreadyExists === undefined) {
-            addParticipantVisitor(t, path.node.value, participant);
+          if (add) {
+            if (participantAlreadyExists === undefined) {
+              addParticipantVisitor(t, path.node.value, participant);
+            }
+          } else {
+            if (participantAlreadyExists !== undefined) {
+              removeParticipantVisitor(path.node.value, participant);
+            }
           }
         }
       },
@@ -70,18 +84,18 @@ const addParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOptions
   };
 };
 
-export const addParticipantCwkConfig = async (participant: string, file: Uri) => {
+export const changeParticipantCwkConfig = async (participant: string, file: Uri, add = true) => {
   if (fs.existsSync(file.path)) {
-    const cfgCodeAsUInt8Array = await vscode.workspace.fs.readFile(file);
+    const cfgCodeAsUInt8Array = await workspace.fs.readFile(file);
     const cfgCode = new TextDecoder('utf-8').decode(cfgCodeAsUInt8Array);
 
-    const newCfg = transformSync(cfgCode, {
-      plugins: [[addParticipantWithBabel, { participant }]],
+    const newCfg = await transformAsync(cfgCode, {
+      plugins: [[changeParticipantWithBabel, { participant, add }]],
     });
 
     if (newCfg && newCfg.code && newCfg.code !== cfgCode) {
       const newCfgAsUInt8Array = new TextEncoder().encode(newCfg.code);
-      await vscode.workspace.fs.writeFile(file, newCfgAsUInt8Array);
+      await workspace.fs.writeFile(file, newCfgAsUInt8Array);
       return true;
     }
   }

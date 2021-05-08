@@ -1,4 +1,5 @@
 /node_modules/
 /out/
 /.vscode-test/
-/sandbox-dir/participants
+/sandbox-dir/participants/**
+!/sandbox-dir/participants/.vsls.json
