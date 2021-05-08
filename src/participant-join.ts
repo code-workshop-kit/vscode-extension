@@ -6,11 +6,10 @@ import { changeParticipantCwkConfig } from './transformCwkConfig';
 import { writeFileToPathOnDisk } from './utils/writeFileToPathOnDisk';
 
 async function createMissingDisconnectedFolder(file: Uri) {
-  const disconnectedFolderUri = Uri.file(
-    `${path.dirname(file.path)}/participants/_cwk_disconnected`,
-  );
+  const disconnectedFolderPath = `${path.dirname(file.path)}/participants/_cwk_disconnected`;
+  const disconnectedFolderUri = Uri.file(disconnectedFolderPath);
   try {
-    await fs.access(`${path.dirname(file.path)}/participants/_cwk_disconnected/`);
+    await fs.access(disconnectedFolderPath);
   } catch (e) {
     await workspace.fs.createDirectory(disconnectedFolderUri);
   }
@@ -34,6 +33,28 @@ export async function handleParticipantLeave(user: string, file: Uri) {
   }
 }
 
+async function scaffoldForParticipant(
+  user: string,
+  file: Uri,
+  templateData: { [key: string]: unknown },
+) {
+  const copiedFiles = await copyTemplates(
+    `${path.dirname(file.path)}/template/**`,
+    `${path.dirname(file.path)}/participants/${user}`,
+    {
+      participantName: user,
+      ...templateData,
+    },
+  );
+  const copiedFilesPromises: Promise<void>[] = [];
+  copiedFiles.forEach((copiedFile) => {
+    copiedFilesPromises.push(
+      writeFileToPathOnDisk(Uri.file(copiedFile.toPath), copiedFile.processed, false),
+    );
+  });
+  await Promise.all(copiedFilesPromises);
+}
+
 export async function handleParticipantJoin(
   user: string,
   file: Uri,
@@ -55,21 +76,7 @@ export async function handleParticipantJoin(
       });
       await workspace.fs.delete(disconnectedParticipantFolderUri, { recursive: true });
     } catch (e) {
-      const copiedFiles = await copyTemplates(
-        `${path.dirname(file.path)}/template/**`,
-        `${path.dirname(file.path)}/participants/${user}`,
-        {
-          participantName: user,
-          ...templateData,
-        },
-      );
-      const copiedFilesPromises: Promise<void>[] = [];
-      copiedFiles.forEach((copiedFile) => {
-        copiedFilesPromises.push(
-          writeFileToPathOnDisk(Uri.file(copiedFile.toPath), copiedFile.processed, false),
-        );
-      });
-      await Promise.all(copiedFilesPromises);
+      await scaffoldForParticipant(user, file, templateData);
     }
   }
 }

@@ -1,7 +1,7 @@
 // Base cwk config
 export default {
   // Put your participants here!
-  participants: ['Joren Broekema'],
+  participants: [],
   admins: [],
   adminPassword: 'pineapples',
   appKey: '3d70850323dd58bf9a6feb6ceefa5c651301e80061891c7fef9bb8e2',

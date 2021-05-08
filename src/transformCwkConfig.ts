@@ -69,14 +69,10 @@ const changeParticipantWithBabel = (babel: Babel): { visitor: Visitor<PluginOpti
             return elem.value === participant;
           });
 
-          if (add) {
-            if (participantAlreadyExists === undefined) {
-              addParticipantVisitor(t, path.node.value, participant);
-            }
-          } else {
-            if (participantAlreadyExists !== undefined) {
-              removeParticipantVisitor(path.node.value, participant);
-            }
+          if (add && participantAlreadyExists === undefined) {
+            addParticipantVisitor(t, path.node.value, participant);
+          } else if (participantAlreadyExists !== undefined) {
+            removeParticipantVisitor(path.node.value, participant);
           }
         }
       },
