@@ -9,6 +9,8 @@ and VS Code Live Share extension.
 - Finds your `cwk.config.js` file, and updates the array of
   participants whenever a new user joins your Live Share session
 - Automatically scaffold workshop files for newly joined participants
+- Integration with [CodeStatus](https://github.com/lostintangent/codestatus)
+  through commands `CWK: Sync GitHub Status` and `CWK: Desync GitHub Status`
 
 Coming soon:
 

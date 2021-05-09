@@ -16,10 +16,22 @@
   "publisher": "code-workshop-kit",
   "icon": "cwk.png",
   "activationEvents": [
-    "workspaceContains:**/cwk.config.js"
+    "workspaceContains:**/cwk.config.js",
+    "onCommand:code-workshop-kit-extension.setupCodeStatus"
   ],
   "main": "./out/extension.js",
-  "contributes": {},
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-workshop-kit-extension.syncCodeStatus",
+        "title": "CWK: Sync GitHub Status"
+      },
+      {
+        "command": "code-workshop-kit-extension.desyncCodeStatus",
+        "title": "CWK: Desync GitHub Status"
+      }
+    ]
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
